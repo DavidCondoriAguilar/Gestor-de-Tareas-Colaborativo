@@ -1,0 +1,128 @@
+@page
+@model TaskManager.Pages.IndexModel
+@{
+    ViewData["Title"] = "Gestor de Tareas";
+}
+
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    @if (TempData["TaskCreated"] != null)
+    {
+        <div id="taskCreatedFlag" data-created="true"></div>
+    }
+
+    <section class="form-container">
+        <h2>Crear Nueva Tarea</h2>
+        <form method="post">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label asp-for="NuevaTarea.Titulo">Título *</label>
+                    <input asp-for="NuevaTarea.Titulo" class="form-control" />
+                    <span asp-validation-for="NuevaTarea.Titulo" class="text-danger"></span> 
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="NuevaTarea.FechaVencimiento">Fecha de Vencimiento</label>
+                    <input asp-for="NuevaTarea.FechaVencimiento" type="date" class="form-control" />
+                </div>
+
+                <div class="form-group full-width">
+                    <label asp-for="NuevaTarea.Descripcion">Descripción</label>
+                    <textarea asp-for="NuevaTarea.Descripcion" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="NuevaTarea.UsuarioAsignadoId">Asignar a:</label>
+                    <select asp-for="NuevaTarea.UsuarioAsignadoId" 
+                            asp-items="@(new SelectList(Model.UsuariosDisponibles, "Id", "Nombre"))"
+                            class="form-control">
+                        <option value="">Sin asignar</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="NuevaTarea.Estado">Estado</label>
+                    <select asp-for="NuevaTarea.Estado" asp-items="Html.GetEnumSelectList<TaskManager.Core.EstadoTarea>()" class="form-control">
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Crear Tarea</button>
+        </form>
+    </section>
+
+    <section class="task-list">
+        <h2>Lista de Tareas</h2>
+        
+        @if (Model.Tareas.Any())
+        {
+            <div class="tasks-grid">
+                @foreach (var tarea in Model.Tareas)
+                {
+                    <div class="task-card estado-@tarea.Estado">
+                        <div class="task-header">
+                            <h3>@tarea.Titulo</h3>
+                            <select class="select-estado-tarea" data-tareaid="@tarea.Id">
+                                @foreach (TaskManager.Core.EstadoTarea estado in Enum.GetValues<TaskManager.Core.EstadoTarea>())
+                                {
+                                    <option value="@estado" selected="@(estado == tarea.Estado)">@estado</option>
+                                }
+                            </select>
+                        </div>
+                        
+                        @if (!string.IsNullOrEmpty(tarea.Descripcion))
+                        {
+                            <p class="task-description">@tarea.Descripcion</p>
+                        }
+                        
+                        <div class="task-info">
+                            <span class="task-status estado-@tarea.Estado">@tarea.Estado</span>
+                            <span class="task-assignee">
+                                Asignado a: @(tarea.UsuarioAsignado?.Nombre ?? "Sin asignar")
+                            </span>
+                            <span class="task-date">
+                                Vence: @tarea.FechaVencimiento.ToString("dd/MM/yyyy")
+                            </span>
+                        </div>
+                        <div class="task-actions">
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@tarea.Id">
+                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="no-tasks">No hay tareas creadas aún. ¡Crea tu primera tarea arriba!</p>
+        }
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const flag = document.getElementById('taskCreatedFlag');
+            const modal = document.getElementById('successModal');
+            const closeBtn = document.getElementById('closeModal');
+            const show = () => modal && modal.classList.add('show');
+            const hide = () => modal && modal.classList.remove('show');
+            if (flag && flag.dataset.created === 'true') { show(); }
+            closeBtn?.addEventListener('click', hide);
+            modal?.addEventListener('click', (e) => { if (e.target === modal) hide(); });
+        });
+    </script>
+}
+
+<!-- Modal de éxito -->
+<div id="successModal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-labelledby="modalTitle" aria-describedby="modalDesc">
+    <h3 id="modalTitle">¡Tarea creada!</h3>
+    <p id="modalDesc">Tu tarea fue creada correctamente.</p>
+    <div class="modal-actions">
+      <button id="closeModal" class="btn btn-primary" type="button">Ok</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,48 @@
+# .NET / Visual Studio / Rider
+bin/
+obj/
+**/bin/
+**/obj/
+*.user
+*.rsuser
+*.suo
+*.cache
+*.ide
+.idea/
+.vs/
+*.ncrunch*
+_ReSharper*/
+*.DotSettings.user
+
+# Build outputs
+*.dll
+*.exe
+*.pdb
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Rider
+.idea/
+*.iml
+
+# NuGet
+*.nupkg
+packages/
+.nuget/
+
+# Publish
+publish/
+
+# EF Migrations bundles
+*.dump
+
+# Node (if any future frontend assets)
+node_modules/
+
+# Env
+*.env
+.env*
