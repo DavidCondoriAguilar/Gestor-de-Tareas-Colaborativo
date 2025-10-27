@@ -46,3 +46,7 @@ node_modules/
 # Env
 *.env
 .env*
+
+# Allow example env files
+!.env.example
+!**/.env.example

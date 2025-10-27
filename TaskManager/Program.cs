@@ -1,6 +1,10 @@
 using TaskManager.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpLogging;
+using DotNetEnv;
+
+// Cargar variables desde .env (si existe) antes de construir la configuración
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
